@@ -4,52 +4,6 @@ import { StyleSheet, Text, View, TouchableOpacity, FlatList } from "react-native
 
 
 
-const tasks = [
-  {
-    id: "TASK-001",
-    title: "Fix Plumbing in the Nagala Park Area",
-    team: "Operations",
-    status: "Pending",
-    dueDate: "Jul 28, 2025",
-  },
-  {
-    id: "TASK-002",
-    title: "New WiFi Connection in Shahupuri",
-    team: "Finance",
-    status: "In Progress",
-    dueDate: "Jul 30, 2025",
-  },
-  {
-    id: "TASK-003",
-    title: "Electricity down in Rajarampuri",
-    team: "HR",
-    status: "Completed",
-    dueDate: "Jul 25, 2025",
-  },
-  {
-    id: "TASK-004",
-    title: "Update Finance Records",
-    team: "Procurement",
-    status: "In Progress",
-    dueDate: "Aug 05, 2025",
-  },
-  {
-    id: "TASK-005",
-    title: "Collect Payment from Last week",
-    team: "Operations",
-    status: "Pending",
-    dueDate: "Aug 10, 2025",
-  },
-  {
-    id: "TASK-006",
-    title: "Doing good",
-    team: "Legal",
-    status: "Completed",
-    dueDate: "Jul 20, 2025",
-  },
-];
-
-
 function renderTaskItem({item}){
 
   return(
