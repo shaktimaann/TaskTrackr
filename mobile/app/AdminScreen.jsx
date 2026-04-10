@@ -1,58 +1,29 @@
 import { Button } from "@react-navigation/elements";
 import { StyleSheet, Text, View, TouchableOpacity, FlatList } from "react-native";
+import { useEffect,useState } from "react";
+import { router } from "expo-router";
 
 
-
-
-const tasks = [
-  {
-    id: "TASK-001",
-    title: "Fix Plumbing in the Nagala Park Area",
-    team: "Operations",
-    status: "Pending",
-    dueDate: "Jul 28, 2025",
-  },
-  {
-    id: "TASK-002",
-    title: "New WiFi Connection in Shahupuri",
-    team: "Finance",
-    status: "In Progress",
-    dueDate: "Jul 30, 2025",
-  },
-  {
-    id: "TASK-003",
-    title: "Electricity down in Rajarampuri",
-    team: "HR",
-    status: "Completed",
-    dueDate: "Jul 25, 2025",
-  },
-  {
-    id: "TASK-004",
-    title: "Update Finance Records",
-    team: "Procurement",
-    status: "In Progress",
-    dueDate: "Aug 05, 2025",
-  },
-  {
-    id: "TASK-005",
-    title: "Collect Payment from Last week",
-    team: "Operations",
-    status: "Pending",
-    dueDate: "Aug 10, 2025",
-  },
-  {
-    id: "TASK-006",
-    title: "Doing good",
-    team: "Legal",
-    status: "Completed",
-    dueDate: "Jul 20, 2025",
-  },
-];
 
 
 function renderTaskItem({item}){
 
   return(
+
+    <TouchableOpacity
+
+    onPress={() => {
+        router.push({
+          pathname: "/TaskDetails",
+          params: {
+            id: item.id,
+            status: item.status
+          }
+        });
+      }}
+    
+    
+    >
 
  <View style={styles.taskRow}>
       <View style={styles.taskTopRow}>
@@ -64,15 +35,25 @@ function renderTaskItem({item}){
 
       <Text style={styles.taskTitle}>{item.title}</Text>
 
-
+ 
       <View style={styles.taskBottomRow}>
-        <Text style={styles.dueDate}>Due: {item.dueDate}</Text>
+        <Text style={styles.dueDate}>Due: {item.date}</Text>
 
-        <TouchableOpacity style={styles.editButton}>
+
+        {item.status !== "completed" ?<TouchableOpacity style={styles.editButton} onPress={()=>{
+          router.push(
+            {
+              pathname:"/EditTask",
+              params: { id: item.id, title: item.title, description: item.description, email:item.email, date: item.date, status: item.status }
+            }
+          )
+        }}>
           <Text style={styles.editButtonText}>Edit</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>:null}
       </View>
     </View>
+
+    </TouchableOpacity>
 
 
   )
@@ -80,13 +61,67 @@ function renderTaskItem({item}){
 }
 
 
+async function getAllTasks(setTasks){
+
+  try{
+
+  const response = await fetch('http://192.168.1.8:8000/api/tasks/all')
+
+  if(!response.ok){
+    console.log("server error")
+    return
+  }
+
+  const data = await response.json()
+
+  setTasks(data)
+
+
+  }catch(e){
+    console.log(e)
+  }
+  
+
+
+
+
+
+}
+
+
+async function getAllStats(settotalTasks,setpendingTasks,setinProgessTasks,setcompletedTasks){
+
+
+  const response = await fetch('http://192.168.1.8:8000/api/tasks/getAllStats')
+  if(!response.ok){
+
+    console.log("server error")
+
+  }
+  const data = await response.json()
+  const all = data.all
+  const pending = data.pending
+  const inprogress = data.inprogress
+  const completed = data.completed
+
+  settotalTasks(all)
+  setpendingTasks(pending)
+  setinProgessTasks(inprogress)
+  setcompletedTasks(completed)
+
+
+
+
+}
+
+
 function getStatusStyle(status) {
   switch (status) {
-    case "Pending":
+    case "pending":
       return styles.pendingBadge;
-    case "In Progress":
+    case "in-progress":
       return styles.inProgressBadge;
-    case "Completed":
+    case "completed":
       return styles.completedBadge;
     default:
       return styles.pendingBadge;
@@ -95,14 +130,24 @@ function getStatusStyle(status) {
 
 
 export default function AdminScreen() {
+
+  const [tasks,setTasks] = useState([])
+  const [totalTasks,settotalTasks] = useState(0)
+  const [pendingTasks,setpendingTasks] = useState(0)
+  const [inProgessTasks,setinProgessTasks] = useState(0)
+  const [completedTasks,setcompletedTasks] = useState(0)
+
+  useEffect(()=>{getAllTasks(setTasks)},[])
+  useEffect(()=>{getAllStats(settotalTasks,setpendingTasks,setinProgessTasks,setcompletedTasks)},[])
+
+
+
   return (
 
 
     <View
       style={{
         flex: 1,
-        justifyContent: "flex-start",
-        alignItems: "center",
         padding:20,
         backgroundColor: "#f5f7fb",
       }}
@@ -121,6 +166,10 @@ export default function AdminScreen() {
         <>
 
 
+
+        <Text style={styles.pageTitle}>Work Record</Text>
+
+
     
 
       
@@ -128,13 +177,13 @@ export default function AdminScreen() {
         styles.taskheader
       
       }>
-        <Text style={styles.pageTitle}>Work Record</Text>
+        
         <View style = {
         styles.card
       
       }>
         <Text style = {{fontSize:15, color: "#6b7280",}}>Total Tasks</Text>
-        <Text style = {{fontSize:30, marginTop: 10,fontWeight: 700,}}>6</Text>
+        <Text style = {{fontSize:30, marginTop: 10,fontWeight: 700,}}>{totalTasks}</Text>
         </View>
         
         <View style = {
@@ -142,7 +191,7 @@ export default function AdminScreen() {
       
       }>
         <Text style = {{fontSize:15, color: "#6b7280",}}>Pending</Text>
-        <Text style = {{fontSize:30, marginTop: 10,fontWeight: 700,}}>2</Text>
+        <Text style = {{fontSize:30, marginTop: 10,fontWeight: 700,}}>{pendingTasks}</Text>
         </View>
         
         <View style = {
@@ -150,7 +199,7 @@ export default function AdminScreen() {
       
       }>
         <Text style = {{fontSize:15, color: "#6b7280",}}>In Progress</Text>
-        <Text style = {{fontSize:30, marginTop: 10,fontWeight: 700,}}>2</Text>
+        <Text style = {{fontSize:30, marginTop: 10,fontWeight: 700,}}>{inProgessTasks}</Text>
         </View>
 
         <View style = {
@@ -158,7 +207,7 @@ export default function AdminScreen() {
       
       }>
         <Text style = {{fontSize:15, color: "#6b7280",}}>Completed</Text>
-        <Text style = {{fontSize:30, marginTop: 10,fontWeight:700,}}>2</Text>
+        <Text style = {{fontSize:30, marginTop: 10,fontWeight:700,}}>{completedTasks}</Text>
         </View>
 
       </View>
@@ -172,7 +221,11 @@ export default function AdminScreen() {
         paddingHorizontal:5,
       }}>
         <Text style = {{fontSize:18, fontWeight:700,}}>Task List</Text>
-        <TouchableOpacity style={{backgroundColor: "#2563eb", paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10,}}>
+        <TouchableOpacity style={{backgroundColor: "#2563eb", paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10,}} onPress={()=>{
+          router.push({
+            pathname:"/AddTask"
+          })
+        }}>
         <Text style={{  color: "#ffffff", fontWeight: "600", fontSize: 14,}}>+ Add Task</Text>
         </TouchableOpacity>
 
@@ -200,14 +253,13 @@ const styles = StyleSheet.create({
     display: "flex" ,
     flexDirection : "row",
     flexWrap:"wrap",
-    gap: 15,
-    justifyContent: "center",
-    marginTop:0,
+    justifyContent: "space-between",
+    marginTop:10,
    
   },
   card:{
 
-    width : 150,
+    width : "48%",
     height : 100,
     borderWidth: 1,
     borderColor: "gray",
@@ -216,6 +268,7 @@ const styles = StyleSheet.create({
     paddingVertical : 15,
     paddingHorizontal:15,
     borderColor: "#e5e7eb",
+    marginBottom:12,
     color: "#6b7280",
 
   },
@@ -226,6 +279,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#1f2937",
     marginTop: 8,
+    textAlign:"center"
   },
 
   
@@ -311,6 +365,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#374151",
   },
+
+
+  body: {
+  width: "100vw",
+  height: "100vh",
+}
 
 
 })

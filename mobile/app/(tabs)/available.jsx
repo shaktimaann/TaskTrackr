@@ -32,7 +32,7 @@ function getStatusStyle(status) {
 async function startTask(task,setTasks){
 
   try{
-  const response = await fetch(`http://192.168.1.13:8000/api/tasks?id=${task.id}&status=in-progress`)
+  const response = await fetch(`http://192.168.1.8:8000/api/tasks?id=${task.id}&status=in-progress`)
   if(!response.ok){
     console.log("server error")
 
@@ -57,7 +57,7 @@ async function startTask(task,setTasks){
       const token = await AsyncStorage.getItem("token");
       console.log("TOKEN:", token);
 
-      const response = await fetch('http://192.168.1.13:8000/api/tasks/pending',{
+      const response = await fetch('http://192.168.1.8:8000/api/tasks/pending',{
         headers: {
         Authorization: `Bearer ${token}`
       }

@@ -14,7 +14,7 @@ export default function LoginScreen() {
 
     try{
 
-    const response = await fetch("http://192.168.1.13:8000/api/login",{
+    const response = await fetch("http://192.168.1.8:8000/api/login",{
 
       method: 'POST',
       headers:{

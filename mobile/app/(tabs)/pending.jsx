@@ -27,7 +27,7 @@ export default function Pending(){
 
             const token = await AsyncStorage.getItem("token");
 
-            const response = await fetch('http://192.168.1.13:8000/api/tasks/in-progress',
+            const response = await fetch('http://192.168.1.8:8000/api/tasks/in-progress',
                 {
                     headers:{
                         Authorization: `Bearer ${token}`

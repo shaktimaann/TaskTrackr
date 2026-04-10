@@ -70,7 +70,7 @@ export default function Alloted(){
       const token = await AsyncStorage.getItem("token");
       console.log("TOKEN:", token);
 
-      const response = await fetch('http://192.168.1.13:8000/api/tasks/completed',{
+      const response = await fetch('http://192.168.1.8:8000/api/tasks/completed',{
         headers: {
         Authorization: `Bearer ${token}`
       }

@@ -15,7 +15,7 @@ export default function SignUp() {
     }
 
     try {
-      const response = await fetch("http://192.168.1.13:8000/api/signup", {
+      const response = await fetch("http://192.168.1.8:8000/api/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -26,6 +26,7 @@ export default function SignUp() {
       const data = await response.json();
 
       if (!response.ok) {
+
         Alert.alert("Signup Failed", data.error || "Something went wrong");
         return;
       }

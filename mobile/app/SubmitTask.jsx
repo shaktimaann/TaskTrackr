@@ -2,6 +2,9 @@ import { View, Text, TouchableOpacity, Image, TextInput } from "react-native";
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
+import { useLocalSearchParams } from "expo-router";
+
+
 
 
 async function getCurrentLocation(props) {
@@ -30,12 +33,18 @@ async function pickImage(setImage) {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
+      base64: true,
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.5,
+      quality: 0.3,
     });
 
+  
+
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`
+      setImage({uri: result.assets[0].uri,
+      base64: base64Image
+    })
     }
   }
 
@@ -44,6 +53,11 @@ async function pickImage(setImage) {
 
 
 export default function SubmitTask() {
+
+  const idobj = useLocalSearchParams()
+  const id = idobj.taskId
+  console.log(id)
+
 
    const [description, setDescription] = useState("");
   const [beforeImage, setBeforeImage] = useState(null);
@@ -58,13 +72,22 @@ export default function SubmitTask() {
       return;
     }
 
-    console.log({
-      description,
-      beforeImage,
-      afterImage,
-      location
+    const beforeImg = beforeImage.base64
+    const afterImg = afterImage.base64
+
+    const submittedTask = {id,description,beforeImg,afterImg,location}
+    const response = await fetch('http://192.168.1.8:8000/api/task/submit',{
+      method:'POST',
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(submittedTask)
     });
 
+    if (!response.ok){
+      console.log("server error")
+      return
+    }
 
   }
 
@@ -109,7 +132,7 @@ export default function SubmitTask() {
 
       {beforeImage && (
         <Image
-          source={{ uri: beforeImage }}
+          source={{ uri: beforeImage.uri }}
           style={{ width: "100%", height: 150, marginBottom: 10 }}
         />
       )}
@@ -129,7 +152,7 @@ export default function SubmitTask() {
 
       {afterImage && (
         <Image
-          source={{ uri: afterImage }}
+          source={{ uri: afterImage.uri }}
           style={{ width: "100%", height: 150, marginBottom: 10 }}
         />
       )}
@@ -159,7 +182,7 @@ export default function SubmitTask() {
       <TouchableOpacity
         onPress={handleSubmit}
         style={{
-          backgroundColor: "black",
+          backgroundColor: "#2563eb",
           padding: 12,
           borderRadius: 8
         }}
