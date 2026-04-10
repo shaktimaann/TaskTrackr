@@ -5,8 +5,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RefreshControl } from "react-native";
 
-const allotedTasks = [{"id":12,"title":"this is alloted task","date":"Jul 28, 2025","status":"Pending"},{"id":11,"title":"this is alloted task","date":"Jul 28, 2025","status":"In Progress"}]
-
 
 function getStatusStyle(status) {
   switch (status) {
